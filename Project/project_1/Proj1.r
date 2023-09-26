@@ -1,7 +1,7 @@
 a <- scan("./resource/4300-0.txt",what="character",skip=73,nlines=32858-73) 
 a <- gsub("_(","",a,fixed=TRUE) ## remove "_("
 
-
+##Done by Alex
 split_punct <- function(x){ #function to separate the punctuation marks
   ii <- grep(",|\\.|;|!|:|\\?",x) ##checking which string containing punctuation
   xs <- rep("",length(ii)+length(x)) ##create a new empty vector
@@ -18,4 +18,6 @@ count <- tabulate(matching_index) #counting the unique words
 m <- 500 #threshold number of occurrences
 b <- unique_words[count>m] #listing out the element that appear many times
 b
+
+##
 
