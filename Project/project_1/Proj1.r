@@ -19,5 +19,27 @@ m <- 500 #threshold number of occurrences
 b <- unique_words[count>m] #listing out the element that appear many times
 b
 
+##yuna
+#7 
+matching_index <- match(tolower(new_a), b) #finding the index of common words
+
+matching_shifted_one <- c(matching_index[-1]) # Shift the index vector by one place
+matching_shifted_two <- c(matching_index[-(1:2)]) # Shift the index vector by one place
+
+# Create the T matrix
+T_matrix <- cbind(matching_index, matching_shifted_one, matching_shifted_two)
+
+# Identify common word triplets (drop triplets that contain an NA)
+common_triplets <- T_matrix[rowSums(is.na(T_matrix)) == 0, ]
+
+# Create the P matrix
+P_matrix <- cbind(matching_index, matching_shifted_one)
+
+# Identify common word pair (drop pairs that contain an NA)
+common_pairs<- P_matrix[rowSums(is.na(P_matrix)) == 0, ]
+
+
 ##
+
+
 
