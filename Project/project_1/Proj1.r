@@ -1,9 +1,9 @@
-## This following code will produce 2nd order Markov-chain model for next-token prediction.
+## This following code will produce 2nd order Markov model for next-token prediction.
 # Contributions:
 # 1. All: prepare the data and github
 # 2. Alex: Build pre-processing part (1-6)
 # 3. Yuna: Build Pair and Triplet of the words
-# 4. Alim: Build the Markov-chain model, baseline, and create the documentation.
+# 4. Alim: Build the Markov model, baseline, and create the documentation.
 
 ## ------------- Set up the parameters
 m <- 1000 # threshold number of occurrences
@@ -60,7 +60,7 @@ P_matrix <- cbind(matching_index, matching_shifted_one) # Create the P matrix
 common_pairs <- P_matrix[rowSums(is.na(P_matrix)) == 0, ] # Identify common word pair (drop pairs that contain an NA)
 
 
-## Create a 2nd-orders Markov Chain Model
+## Create a 2nd-orders Markov Model
 model_markov_2nd <- function(vocab, common_triplets, word1, word2) {
   # function to predict the 3rd column based on 1st and 2nd columns
   
@@ -79,7 +79,7 @@ model_markov_2nd <- function(vocab, common_triplets, word1, word2) {
   common_triplets_filter <- common_triplets[!is.na(temp_match), ]
   
   # Logic to return NA if there is no rows in the data. 
-  # Later, we will use 1st-order of Markov Chain model (pair) instead. 
+  # Later, we will use 1st-order of Markov model (pair) instead. 
   if (length(common_triplets_filter) == 0) {
     next_token <- NA # return NA if there's no matched row
   } else if (length(common_triplets_filter['matching_shifted_two']) == 1) {
@@ -94,7 +94,7 @@ model_markov_2nd <- function(vocab, common_triplets, word1, word2) {
   return(next_token)
 }
 
-## Create an 1st-orders Markov Chain Model
+## Create an 1st-orders Markov Model
 model_markov_1st <- function(vocab, common_pairs, word1) {
   # function to predict the 2nd column based on 1st columns
   
@@ -131,18 +131,18 @@ model_common_words <- function(vocab, vocab_freq) {
   return(next_token)
 }
 
-## Final Models: combination of 2nd and 1st orders markov chain with common words.
+## Final Models: combination of 2nd and 1st orders markov with common words.
 # If the 2nd order unable to generate the prediction, it will use the 1st order
 # If the 1st order unable to generate the prediction, it will use the common word.
 model_next_token <- function(vocab, vocab_freq, common_pairs, common_triplets, word1, word2) {
-  # A function to get prediction from the 2nd order markov chain
+  # A function to get prediction from the 2nd order markov
   next_token <- model_markov_2nd(vocab, common_triplets, word1, word2)
   model_source <- "triplet"
   
   # Logic to check whether or not the model give at least 1 prediction
   if (is.na(next_token) == TRUE) {
     # If no (there's no prediction)
-    # Get the prediction from the 1st order markov chain
+    # Get the prediction from the 1st order markov
     next_token <- model_markov_1st(vocab, common_pairs, word2)
     model_source <- "pair"
   }
@@ -160,7 +160,7 @@ model_next_token <- function(vocab, vocab_freq, common_pairs, common_triplets, w
 
 
 
-## Tabulate the 50 samples of Markov Chain Model
+## Tabulate the 50 samples of Markov Model
 cat('2nd-order Markov Model')
 for (x in 1:50) {
   # Collect a word from common word.
