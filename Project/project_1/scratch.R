@@ -148,7 +148,7 @@ model_next_token_func <- function(vocab, vocab_freq, common_pairs, common_triple
   
   return(c(next_token, model_source))
 }
-
+# Interactive GUI.
 while (TRUE) {
   model_input <- readline(prompt="Model Inputs (2 words): ")
   word1 = strsplit(model_input, " ")[[1]]
