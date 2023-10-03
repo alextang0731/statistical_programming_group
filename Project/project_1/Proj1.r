@@ -101,7 +101,7 @@ common_pairs <- P_matrix[rowSums(is.na(P_matrix)) == 0, ] # Identify common word
 model_markov_2nd <- function(vocab, common_triplets, word1, word2) {
   # function to predict the 3rd column based on 1st and 2nd columns
   
-  # Given word 1 and word 2, get the index
+  # Given word 1 and word 2, get their indices
   idx_i <- which(vocab == word1)
   idx_j <- which(vocab == word2)
   
