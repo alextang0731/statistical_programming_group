@@ -161,39 +161,102 @@ model_next_token <- function(vocab, vocab_freq, common_pairs, common_triplets, w
   return(c(next_token, model_source))
 }
 
+caps <- function(bb) {
+  first_char = substr(bb,1,1)
+  first_char = toupper(first_char)
+  rest_chars = substr(bb,2,10^8)
+  result = paste(first_char, rest_chars, sep='')  
+  return(result)
+}
 
 
-## Tabulate the 50 samples of Markov Model
+
+b_caps = caps(b)
+
+matching_caps_index <- match(new_a, b_caps, nomatch=0)
+count_caps <- tabulate(matching_caps_index) # counting the words
+caps_ratio = count_caps/b_count
+b_index_caps = caps_ratio>0.5
+
+# Create vocab mix (caps and non caps). But, it's not memory efficient.
+#b_mix = rep(length(b))
+
+#b_mix[b_index_caps] = b_caps[b_index_caps]
+#b_mix[!b_index_caps] = b[!b_index_caps]
+
+# Hence, create a vocab for the b caps
+b_caps_vocab = tolower(b_caps[b_index_caps])
+
+
+is_caps_validation = length(count_caps) == length(b_count)
+if (is_caps_validation){
+  cat("Warning: There's a problem with the capitalized word")
+}
+
+## Tabulate the 50 samples of Markov Chain Model
 cat('2nd-order Markov Model')
+text_result = c()
+text_result_caps = c()
+
 for (x in 1:50) {
-  # Collect a word from common word.
-  word_i <- model_common_words(vocab=b, vocab_freq=b_count)
-  # cat(word_i[1], '\t') # for debugging
-  
-  # Collect the second word from pair or common words
-  word_j <- model_next_token(b, b_count, common_pairs, common_triplets, "", word_i[1])
-  # cat(word_j[1], '\t') # for debugging
-  
-  # Collect the third word from the triplet, pair, or common word
-  word_k <- model_next_token(b, b_count, common_pairs, common_triplets, word_i[1], word_j[1])
-  
-  cat(paste(x, word_i[1], word_j[1], word_k[1], '\n', sep=' '))
+  if (x == 1) {
+    next_word <- model_common_words(vocab=b, vocab_freq=b_count)
+    text_result <- c(text_result, next_word)
+
+    if (next_word %in% b_caps_vocab)
+      {text_result_caps <- c(text_result_caps, caps(next_word))}
+    else
+      {text_result_caps <- c(text_result_caps, next_word)}
+  } else if ( x == 2) {
+    word_i = text_result[length(text_result)]
+    next_word <- model_next_token(b, b_count, common_pairs, common_triplets, "", word_i)[1]
+    text_result <- c(text_result, next_word)
+    
+    if (next_word %in% b_caps_vocab)
+      {text_result_caps <- c(text_result_caps, caps(next_word))}
+    else
+      {text_result_caps <- c(text_result_caps, next_word)}
+    
+  } else {
+    word_i = text_result[length(text_result)-1]
+    word_j = text_result[length(text_result)]
+    next_word <- model_next_token(b, b_count, common_pairs, common_triplets, word_i, word_j)[1]
+    text_result <- c(text_result, next_word)
+    
+    if (next_word %in% b_caps_vocab)
+      {text_result_caps <- c(text_result_caps, caps(next_word))}
+    else
+      {text_result_caps <- c(text_result_caps, next_word)}
+  }
 }
 
 ## Tabulate the 50 samples of Common Word Model
-cat('Common Word Model')
+text_result_baseline = c()
+text_result_baseline_caps = c()
 for (x in 1:50) {
-  # Collect a word from common word.
-  word_i <- model_common_words(vocab=b, vocab_freq=b_count)
-  # cat(word_i[1], '\t') # for debugging
-  
-  # Collect the second word from pair or common words
-  word_j <- model_common_words(vocab=b, vocab_freq=b_count)
-  # cat(word_j[1], '\t') # for debugging
-  
-  # Collect the third word from the triplet, pair, or common word
-  word_k <- model_common_words(vocab=b, vocab_freq=b_count)
-  
-  # Print out the result using cat
-  cat(paste(x, word_i[1], word_j[1], word_k[1], '\n', sep=' '))
+    next_word <- model_common_words(vocab=b, vocab_freq=b_count)
+    text_result_baseline <- c(text_result_baseline, next_word)
+    if (next_word %in% b_caps_vocab)
+      {text_result_baseline_caps <- c(text_result_baseline_caps, caps(next_word))}
+    else
+      {text_result_baseline_caps <- c(text_result_baseline_caps, next_word)}    
+    
 }
+
+cat('2nd-order markov model: ')
+cat(text_result) 
+# Output Sample: the we , their it . . she of ! fell of in do till the up is ! , : him the her till boylan the of take the of , , to at any , even other two near , and than went if me night the ?
+
+cat(text_result_caps)
+# Output Sample: the we , their it . . she of ! fell of in do till the up is ! , : him the her till Boylan the of take the of , , to at any , even other two near , and than went if me night the ?"
+
+# Word `Boylan` uses capital at the first latter.
+
+cat('/n')
+cat('common words: ')
+cat(text_result_baseline)
+# Output Example: seen my he after his of up i it and , half seen the an come head took it , said and , of he and be of their that’s the a to its : their . what know well up of that ) the but it miss his .
+
+cat(text_result_baseline_caps)
+# Output Example: seen my he after his of up I it and , half seen the an come head took it , said and , of he and be of their That’s the a to its : their . what know well up of that ) the but it Miss his .
+#note: `I`, `That’s`, and `Miss` are mostly started with capital letter.
