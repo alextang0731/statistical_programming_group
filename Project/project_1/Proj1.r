@@ -1,18 +1,22 @@
+###Group Members:
+#1. Alex Tang s2592944
+#2. Alim Hanif s
+#3. Yuna Choi s
+
 ## This following code will produce 2nd order Markov model for next-token prediction.
 # Contributions:
 # 1. All: prepare the data and github
 # 2. Alex: Build pre-processing part (1-6)
 # 3. Yuna: Build Pair and Triplet of the words
 # 4. Alim: Build the Markov model, baseline, and create the documentation.
+# 5. Alim and Alex: Work for the additional question
+
+#Remarks: Everyone works on equally contribution and everyone involved in every question discussion
+
+
 
 ## ------------- Set up the parameters
 m <- 1000 # threshold number of occurrences
-
-# Shift the index vector by one place
-matching_shifted_one <- c(matching_index[-1]) 
-
-# Shift the index vector by one place
-matching_shifted_two <- c(matching_index[-(1:2)]) 
 
 ## ------------- Set up the parameter above.
 
@@ -197,3 +201,19 @@ for (x in 1:50) {
   # Print out the result using cat
   cat(paste(x, word_i[1], word_j[1], word_k[1], '\n', sep=' '))
 }
+
+#for the last question
+df <- data.frame(new_a) #create a data frame for later analysis
+df$lower <- tolower(df$new_a) #lowercase all word first
+df$captial <- grepl("^[A-Z]",df$new_a) #checking whether the word is start with capital letter
+result <- as.data.frame(table(df$lower,df$captial)) #group all information
+need_cap_word_temp <- as.character(subset(result,Var2==TRUE&Freq>Freq[Var2==FALSE])$Var1) #finding the words that we want
+need_cap_word <- gsub("(^|\\s)(\\w)","\\1\\U\\2", need_cap_word_temp, perl = TRUE) #Capitalize each word for further usage
+#Example for checking
+length(grep("^Pump$", new_a))
+length(grep("^pump$", new_a))
+length(grep("^pump$", need_cap_word))
+length(grep("^Pump$", need_cap_word))
+length(grep("^Mulligan$", need_cap_word))
+length(grep("^Mulligan$", new_a))
+length(grep("^mulligan$", new_a))
