@@ -1,17 +1,17 @@
 ###Group Members:
 #Group 11
 #1. Alex Tang s2592944
-#2. Alim Hanif s
-#3. Yuna Choi s
+#2. Alim Hanif s2442474
+#3. Yuna Choi s2120762
 
 # Contributions:
 # 1. All: prepare the data and github
-# 2. Alex: Build pre-processing part (1-6)
+# 2. Alex: Build all pre-processing part (1-6)
 # 3. Yuna: Build Pair and Triplet of the words
 # 4. Alim: Build the Markov model, baseline, and create the documentation.
 # 5. Alim and Alex: Work for the additional question
 
-#Remarks: Everyone worked on equally contribution and everyone involved in every question discussion
+#Remarks: Everyone worked on equally contribution and everyone involved in discussing every questions
 
 ##### This following code will produce 2nd order Markov model for next-token prediction.#####
 ## ------------- Set up the parameters
