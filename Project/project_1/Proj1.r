@@ -10,7 +10,7 @@
 # 4. Alim: Build the Markov model, baseline, and create the documentation.
 # 5. Alim and Alex: Work for the additional question
 
-#Remarks: Everyone works on equally contribution and everyone involved in every question discussion
+#Remarks: Everyone worked on equally contribution and everyone involved in every question discussion
 
 ##### This following code will produce 2nd order Markov model for next-token prediction.#####
 ## ------------- Set up the parameters
