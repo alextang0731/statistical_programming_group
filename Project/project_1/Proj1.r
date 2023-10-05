@@ -17,11 +17,7 @@
 ## ------------- Set up the parameters
 m <- 1000 # threshold number of occurrences
 
-
-## ------------- Set up the parameter above.
-
 ## Preparation
-
 # Load the dataset
 a <- scan("./resource/4300-0.txt", what = "character", skip = 73, nlines = 32858 - 73)
 
