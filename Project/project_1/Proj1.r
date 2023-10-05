@@ -3,7 +3,6 @@
 #2. Alim Hanif s
 #3. Yuna Choi s
 
-## This following code will produce 2nd order Markov model for next-token prediction.
 # Contributions:
 # 1. All: prepare the data and github
 # 2. Alex: Build pre-processing part (1-6)
@@ -13,6 +12,7 @@
 
 #Remarks: Everyone works on equally contribution and everyone involved in every question discussion
 
+##### This following code will produce 2nd order Markov model for next-token prediction.#####
 ## ------------- Set up the parameters
 m <- 1000 # threshold number of occurrences
 
