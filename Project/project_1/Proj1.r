@@ -13,7 +13,6 @@
 
 #Remarks: Everyone works on equally contribution and everyone involved in every question discussion
 
-
 ## ------------- Set up the parameters
 m <- 1000 # threshold number of occurrences
 
@@ -312,3 +311,6 @@ cat(text_result_baseline)
 cat(text_result_baseline_caps)
 # Output Example: seen my he after his of up I it and , half seen the an come head took it , said and , of he and be of their That’s the a to its : their . what know well up of that ) the but it Miss his .
 #note: `I`, `That’s`, and `Miss` are mostly started with capital letter.
+
+
+
