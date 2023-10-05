@@ -14,9 +14,9 @@
 #Remarks: Everyone works on equally contribution and everyone involved in every question discussion
 
 
-
 ## ------------- Set up the parameters
 m <- 1000 # threshold number of occurrences
+
 
 ## ------------- Set up the parameter above.
 
@@ -31,6 +31,11 @@ a <- gsub("_(", "", a, fixed = TRUE) ## remove "_("
 
 ## Create a function to split the text and pre-processing. (tokenizer)
 split_punct <- function(text_input) {
+  ## Function to split the text into token/word with preprocessing.
+  ## Parameters:
+  ##    text_input(str): string input to be preprocessed.
+  ## return: 
+  ##    vector of preprocessed tokens.  
   ii <- grep(",|\\.|;|!|:|\\?", text_input) ## checking which string containing punctuation
   xs <- rep("", length(ii) + length(text_input)) ## create a new empty vector
   iis <- ii + 1:length(ii) ## stated where should punctuation go in xs?
@@ -69,7 +74,14 @@ common_pairs <- P_matrix[rowSums(is.na(P_matrix)) == 0, ] # Identify common word
 
 ## Create a 2nd-orders Markov Model
 model_markov_2nd <- function(vocab, common_triplets, word1, word2) {
-  # function to predict the 3rd column based on 1st and 2nd columns
+  ## Function to predict the 3rd column based on 1st and 2nd columns
+  ## Parameters:
+  ##    vocab(vector): vocabulary of tokens
+  ##    common_triplets(vector): all the possible triplets
+  ##    word1: the N-2 (k[i]) word of the predicted text (N) 
+  ##    word2: the N-1 (k[j]) word of the predicted text (N)
+  ## return: 
+  ##    the next token/word after word1 and word 2. It returns NA when no matched triplet has found.  
   
   # Given word 1 and word 2, get their indices
   idx_i <- which(vocab == word1)
@@ -103,7 +115,14 @@ model_markov_2nd <- function(vocab, common_triplets, word1, word2) {
 
 ## Create an 1st-orders Markov Model
 model_markov_1st <- function(vocab, common_pairs, word1) {
-  # function to predict the 2nd column based on 1st columns
+  ## Function to predict the 2nd column based on 1st columns
+  ## Parameters:
+  ##    vocab(vector): vocabulary of tokens
+  ##    common_pairs(vector): all the possible pairs
+  ##    word1: the N-1 (k[j]) word of the predicted text (N) 
+  ## return: 
+  ##    the next token/word after word1. It returns NA when no matched pair has found. 
+  
   
   # Given word 1, get the index
   idx_i <- which(vocab == word1)
@@ -132,9 +151,13 @@ model_markov_1st <- function(vocab, common_pairs, word1) {
 
 ## Create a model that returns the word from the common words.
 model_common_words <- function(vocab, vocab_freq) {
-  # Get the sample from the vocab (unique)
-  # Note: number of occurrence (frequency) will be the probability.
-  next_token <- sample(vocab, 1, prob = vocab_freq)
+  ## Function to get the sample from the vocab
+  ## Parameters:
+  ##    vocab(vector): vocabulary of tokens (unique)
+  ##    vocab_freq(vector): the frequency of the vocab in the document. It will be used to maintain the probability during sampling.
+  ## return: 
+  ##    a word from the common words
+  next_token <- sample(vocab, 1, prob = vocab_freq) # sample a word from vocab, with maintain the probability.
   return(next_token)
 }
 
@@ -142,7 +165,17 @@ model_common_words <- function(vocab, vocab_freq) {
 # If the 2nd order unable to generate the prediction, it will use the 1st order
 # If the 1st order unable to generate the prediction, it will use the common word.
 model_next_token <- function(vocab, vocab_freq, common_pairs, common_triplets, word1, word2) {
-  # A function to get prediction from the 2nd order markov
+  ## Function to combine the triplet, pairs, and common word models.
+  ## Parameters:
+  ##    vocab(vector): vocabulary of tokens
+  ##    common_pairs(vector): all the possible pairs
+  ##    common_triplets(vector): all the possible triplets
+  ##    word1: the N-2 (k[i]) word of the predicted text (N) 
+  ##    word2: the N-1 (k[j]) word of the predicted text (N)
+  ## return: 
+  ##    - the next token/word
+  ##    - source of the model ['triplet', 'pair', 'common_word']  
+  
   next_token <- model_markov_2nd(vocab, common_triplets, word1, word2)
   model_source <- "triplet"
   
@@ -165,55 +198,121 @@ model_next_token <- function(vocab, vocab_freq, common_pairs, common_triplets, w
   return(c(next_token, model_source))
 }
 
+caps <- function(word) {
+  ## Function to capitalize the first letter
+  ## Parameters:
+  ##    word: the targeted string
+  ## return: 
+  ##    string with a capitalized first letter
+  first_char = substr(word,1,1) # get the first character
+  first_char = toupper(first_char) # capitalize it
+  rest_chars = substr(word,2,10^8) # get the res of the characters
+  result = paste(first_char, rest_chars, sep='') # combine the first and the rest chars
+  return(result)
+}
+
+# modify b with capitalized first letter into variable b_caps
+b_caps = caps(b)
+
+# calculate how many words with capitalized first letter on the document
+matching_caps_index <- match(new_a, b_caps, nomatch=0)
+count_caps <- tabulate(matching_caps_index) # counting the words
+# calculate the ratio of capitalized first letter over the frequency
+caps_ratio = count_caps/b_count
+# select only those words that at least 50% were written with capitalized first letter.
+b_index_caps = caps_ratio>0.5
+
+# Not being used due to not memory efficient.
+# Create vocab mix (caps and non caps).
+#b_mix = rep(length(b))
+#b_mix[b_index_caps] = b_caps[b_index_caps]
+#b_mix[!b_index_caps] = b[!b_index_caps]
 
 
-## Tabulate the 50 samples of Markov Model
+# Hence, create a vocab for the b caps
+b_caps_vocab = tolower(b_caps[b_index_caps])
+
+# To validate the list of word contains capitalized first letter and lower case are the same.
+is_caps_validation = length(count_caps) == length(b_count)
+if (is_caps_validation){
+  cat("Warning: There's a problem with the capitalized word")
+}
+
+## Tabulate the 50 samples of Markov Chain Model
 cat('2nd-order Markov Model')
+text_result = c()
+text_result_caps = c()
+
+# Iterate 50 times to create a sentence with 2nd order markov model.
 for (x in 1:50) {
-  # Collect a word from common word.
-  word_i <- model_common_words(vocab=b, vocab_freq=b_count)
-  # cat(word_i[1], '\t') # for debugging
-  
-  # Collect the second word from pair or common words
-  word_j <- model_next_token(b, b_count, common_pairs, common_triplets, "", word_i[1])
-  # cat(word_j[1], '\t') # for debugging
-  
-  # Collect the third word from the triplet, pair, or common word
-  word_k <- model_next_token(b, b_count, common_pairs, common_triplets, word_i[1], word_j[1])
-  
-  cat(paste(x, word_i[1], word_j[1], word_k[1], '\n', sep=' '))
+  if (x == 1) {
+    # generate first word from the common words.
+    next_word <- model_common_words(vocab=b, vocab_freq=b_count)
+    text_result <- c(text_result, next_word)
+    
+    # logic to check whether the predicted word should be with capitalized or not.
+    if (next_word %in% b_caps_vocab)
+    {text_result_caps <- c(text_result_caps, caps(next_word))}
+    else
+    {text_result_caps <- c(text_result_caps, next_word)}
+  } else if ( x == 2) {
+    # generate second word from a pair.
+    word_i = text_result[length(text_result)]
+    next_word <- model_next_token(b, b_count, common_pairs, common_triplets, "", word_i)[1]
+    text_result <- c(text_result, next_word)
+    
+    # logic to check whether the predicted word should be with capitalized or not.
+    if (next_word %in% b_caps_vocab)
+    {text_result_caps <- c(text_result_caps, caps(next_word))}
+    else
+    {text_result_caps <- c(text_result_caps, next_word)}
+    
+  } else {
+    # generate thr rest of the words from a triplet.
+    word_i = text_result[length(text_result)-1]
+    word_j = text_result[length(text_result)]
+    next_word <- model_next_token(b, b_count, common_pairs, common_triplets, word_i, word_j)[1]
+    text_result <- c(text_result, next_word)
+    
+    # logic to check whether the predicted word should be with capitalized or not.
+    if (next_word %in% b_caps_vocab)
+    {text_result_caps <- c(text_result_caps, caps(next_word))}
+    else
+    {text_result_caps <- c(text_result_caps, next_word)}
+  }
 }
 
 ## Tabulate the 50 samples of Common Word Model
-cat('Common Word Model')
+text_result_baseline = c()
+text_result_baseline_caps = c()
 for (x in 1:50) {
-  # Collect a word from common word.
-  word_i <- model_common_words(vocab=b, vocab_freq=b_count)
-  # cat(word_i[1], '\t') # for debugging
+  # get the next word from common words.
+  next_word <- model_common_words(vocab=b, vocab_freq=b_count)
+  text_result_baseline <- c(text_result_baseline, next_word)
   
-  # Collect the second word from pair or common words
-  word_j <- model_common_words(vocab=b, vocab_freq=b_count)
-  # cat(word_j[1], '\t') # for debugging
+  # logic to check whether the predicted word should be with capitalized or not.
+  if (next_word %in% b_caps_vocab)
+  {text_result_baseline_caps <- c(text_result_baseline_caps, caps(next_word))}
+  else
+  {text_result_baseline_caps <- c(text_result_baseline_caps, next_word)}    
   
-  # Collect the third word from the triplet, pair, or common word
-  word_k <- model_common_words(vocab=b, vocab_freq=b_count)
-  
-  # Print out the result using cat
-  cat(paste(x, word_i[1], word_j[1], word_k[1], '\n', sep=' '))
 }
 
-#for the last question
-df <- data.frame(new_a) #create a data frame for later analysis
-df$lower <- tolower(df$new_a) #lowercase all word first
-df$captial <- grepl("^[A-Z]",df$new_a) #checking whether the word is start with capital letter
-result <- as.data.frame(table(df$lower,df$captial)) #group all information
-need_cap_word_temp <- as.character(subset(result,Var2==TRUE&Freq>Freq[Var2==FALSE])$Var1) #finding the words that we want
-need_cap_word <- gsub("(^|\\s)(\\w)","\\1\\U\\2", need_cap_word_temp, perl = TRUE) #Capitalize each word for further usage
-#Example for checking
-length(grep("^Pump$", new_a))
-length(grep("^pump$", new_a))
-length(grep("^pump$", need_cap_word))
-length(grep("^Pump$", need_cap_word))
-length(grep("^Mulligan$", need_cap_word))
-length(grep("^Mulligan$", new_a))
-length(grep("^mulligan$", new_a))
+# To print the results.
+cat('2nd-order markov model: ')
+cat(text_result) 
+# Output Sample: the we , their it . . she of ! fell of in do till the up is ! , : him the her till boylan the of take the of , , to at any , even other two near , and than went if me night the ?
+
+cat(text_result_caps)
+# Output Sample: the we , their it . . she of ! fell of in do till the up is ! , : him the her till Boylan the of take the of , , to at any , even other two near , and than went if me night the ?"
+
+# Word `Boylan` uses capital at the first latter.
+
+cat('/n')
+cat('common words: ')
+cat(text_result_baseline)
+# Output Example: seen my he after his of up i it and , half seen the an come head took it , said and , of he and be of their that’s the a to its : their . what know well up of that ) the but it miss his .
+
+cat(text_result_baseline_caps)
+# Output Example: seen my he after his of up I it and , half seen the an come head took it , said and , of he and be of their That’s the a to its : their . what know well up of that ) the but it Miss his .
+#note: `I`, `That’s`, and `Miss` are mostly started with capital letter.
