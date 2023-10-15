@@ -63,7 +63,11 @@ qsim <- function(mf = 5, mb = 5, a.rate = .1, trb = 40, trf = 40, tmb = 30, tmf 
 
     for (i in 1:total_state) {
         # TODO: To stop the process 30 mins before departure.
-        is_car_arrive <- rbinom(1, 1, a.rate)
+        if (min(france_station$state) >= (30 * 60)) {
+            is_car_arrive <- rbinom(1, 1, a.rate)
+        } else {
+            is_car_arrive <- FALSE
+        }
         is_british_available <- slot_checker(british_station)
 
         n_state_f <- sum(france_station["queue"])
