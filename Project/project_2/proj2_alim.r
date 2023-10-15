@@ -1,16 +1,5 @@
 library(ggplot2)
 
-mf <- 5
-mb <- 5
-a.rate <- .1
-trb <- 40
-trf <- 40
-tmb <- 30
-tmf <- 30
-maxb <- 20
-total_state <- 2 * 60 * 60
-total_exp_state <- 200
-
 slot_checker <- function(df_station) {
     total_lower_capacity <- nrow(df_station[df_station$queue < df_station$max_queue, ])
     if (total_lower_capacity > 0) {
