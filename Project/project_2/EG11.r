@@ -158,12 +158,29 @@ df_stat2 <- data.frame(
     idx = 1:7200
 )
 
+
 # Todo: combine these plot into a single of graph (4 panels 2x2)
-ggplot(data = df_stat1, aes(x = idx, y = nf)) +
-    geom_bar(stat = "identity", color = "blue")
-ggplot(data = df_stat1, aes(x = idx, y = nb)) +
-    geom_bar(stat = "identity", color = "blue")
-ggplot(data = df_stat1, aes(x = idx, y = eq)) +
-    geom_bar(stat = "identity", color = "blue")
-ggplot(data = df_stat2, aes(x = idx, y = eq)) +
-    geom_bar(stat = "identity", color = "blue")
+
+#option1
+install.packages("gridExtra")
+library(gridExtra)
+plot1 <-ggplot(data = df_stat1, aes(x = idx, y = nf)) + geom_bar(stat = "identity", color = "blue")
+plot2 <-ggplot(data = df_stat1, aes(x = idx, y = nb)) + geom_bar(stat = "identity", color = "blue")
+plot3 <-ggplot(data = df_stat1, aes(x = idx, y = eq)) + geom_bar(stat = "identity", color = "blue")
+plot4 <-ggplot(data = df_stat2, aes(x = idx, y = eq)) + geom_bar(stat = "identity", color = "blue")
+grid.arrange (plot1, plot2, plot3, plot4)
+
+#option2 
+par(mfrow = c(2, 2))
+plot(df_stat1$nf, type = "l", xlab = "Time", ylab = "French Queue Length", main = "the french queues")
+plot(df_stat1$nb, type = "l", xlab = "Time", ylab = "British Queue Length", main = "the british queues")
+plot(df_stat1$eq, type = "l", xlab = "Time", ylab = "Expected Queuing Time", main = "the expected waiting time")
+plot(df_stat2$eq, type = "l", xlab = "Time", ylab = "Expected Queuing Time(tmb = 40)", main = "the expected waiting time (tmb = 40)")
+
+
+
+
+
+
+
+
