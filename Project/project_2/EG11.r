@@ -1,3 +1,5 @@
+#the proportion of the work is equally assigned to each team member 
+
 library(ggplot2)
 
 slot_checker <- function(df_station) {
