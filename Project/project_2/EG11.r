@@ -83,8 +83,8 @@ qsim <- function(mf = 5, mb = 5, a.rate = .1, trb = 40, trf = 40, tmb = 30, tmf 
         "next_car" = TRUE
     )
     british_station <- data.frame(
-        "station" = 1:mf,
-        "queue" = rep(0, mf),
+        "station" = 1:mb,
+        "queue" = rep(0, mb),
         "next_state" = total_state,
         "next_car" = TRUE
     )
