@@ -131,8 +131,10 @@ qsim <- function(mf = 5, mb = 5, a.rate = .1, trb = 40, trf = 40, tmb = 30, tmf 
         british_station <- process_a_car(british_station, pmin = tmb, pmax = tmb + trb)
 
         # Statistic
-        mean_proc_time_french <- mean(france_station$ptime)
-        mean_proc_time_british <- mean(british_station$ptime)
+        #mean_proc_time_french <- mean(france_station$ptime)
+        mean_proc_time_french <- (trf + tmf + trf)/2
+        #mean_proc_time_british <- mean(british_station$ptime)
+        mean_proc_time_british <- (trb + tmb + trb)/2
 
         nf <- c(nf, mean(france_station$queue))
         nb <- c(nb, mean(british_station$queue))
