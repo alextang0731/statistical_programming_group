@@ -146,6 +146,11 @@ qsim <- function(mf = 5, mb = 5, a.rate = .1, trb = 40, trf = 40, tmb = 30, tmf 
 
 res1 <- qsim(mf = 5, mb = 5, a.rate = .1, trb = 40, trf = 40, tmb = 30, tmf = 30, maxb = 20)
 res2 <- qsim(mf = 5, mb = 5, a.rate = .1, trb = 40, trf = 40, tmb = 40, tmf = 30, maxb = 20)
+###discussion of the implications of small extra delays in British checking
+#The average queue length change over time at British Station shows an increase. 
+#A small increase in extra delays of 10 seconds leads to a significant rise in the mean of average queue length change over time from 0.46 to 2.22. 
+#This means that a 20% increase in extra delays causes a nearly 38% increase in the mean of average queue length change over time. 
+#Similarly, the mean of expected waiting time for the whole system also increases by nearly 36%, from 1051.74 to 1432.54.
 
 df_stat1 <- data.frame(
     time = 1:7200,
@@ -176,7 +181,7 @@ plot(df_stat2$eq, type = "l", xlab = "Time", ylab = "Expected Queuing Time", mai
 simulations <- c()
 n_simulation <- 100
 for (i in 1:n_simulation){
-    iter_res = qsim(mf = 5, mb = 5, a.rate = .1, trb = 40, trf = 40, tmb = 30, tmf = 30, maxb = 20)
+    iter_res = qsim(mf = 5, mb = 5, a.rate = .1, trb = 40, trf = 40, tmb = 40, tmf = 30, maxb = 20)
     gt_0 <- (iter_res$nf[7200]+iter_res$nb[7200])>0
     simulations <- c(simulations, gt_0)
 }
