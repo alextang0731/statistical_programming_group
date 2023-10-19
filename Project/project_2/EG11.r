@@ -190,4 +190,4 @@ cat(probability_missing_car)
 # Findings: 
 #1. We saw the probability of at least there is one missing car with the default parameter on 100runs is 0. We could get a higher probability by increasing the `a.rate`. All of 100 simulation have at least 1 car left if we doubled the a.rate (0.2)
 #2. We noticed that by using default parameters, which the distribution of processing time between French and British stations are the same, it made the British statios never reach maximum queue (20cars). We can either add more stations on the French or reduce number of British station.
-#3. We did an optimization that reduced the duration of simulation from 6s to 0.8s by reducing the dataframe size, slicing using `which`, and use df$col instead of df['col']
+#3. We optimized our initial code that reduced the time duration (@simulation) from 6s to 0.8s by reducing the dataframe size, slicing using `which`, and use df$col instead of df['col']. Further, this finding could be a rule of thumb of utilizing dataframe.
