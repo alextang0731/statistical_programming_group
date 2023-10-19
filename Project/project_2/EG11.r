@@ -1,7 +1,7 @@
 #the proportion of the work is equally assigned to each team member 
 
 library(ggplot2)
-
+set.seed(100000)
 slot_checker <- function(df_station) {
     # Function to check the available slot in the station
     # Parameters:
