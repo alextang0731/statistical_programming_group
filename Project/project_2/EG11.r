@@ -183,7 +183,7 @@ probability_missing_car <- sum(simulations) / n_simulation
 probability_missing_car
 
 ### a brief discussion of the implications of small extra delays in British checking
-# The average queue length change over time at British Station shows an increase.
+# The average queue length change over time at British Station shows an increase after applying a small extra delays in British checking.
 # A small increase in extra delays of 10 seconds leads to a significant rise in the mean of average queue length change over time from 0.46 to 2.22.
 # This means that a 20% increase in extra delays causes a nearly 38% increase in the mean of average queue length change over time.
 # Similarly, the mean of expected waiting time for the whole system also increases by nearly 36%, from 1051.74 to 1432.54.
