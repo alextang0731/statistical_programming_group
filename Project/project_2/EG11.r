@@ -20,7 +20,7 @@ slot_checker <- function(df_station, max_queue) {
 }
 
 add_a_new_car <- function(df_station, max_queue) {
-    # Function to add a new car to the shorthest queue (if slot available)
+    # Function to add a new car to the shortest queue (if slot available)
     # Parameters:
     #   - df_station(data.frame): the statistics of the stations
     #   - max_queue(int): maximum number of queue in the stations e.g., French: Inf, British: 20
