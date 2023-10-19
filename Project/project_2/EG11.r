@@ -165,26 +165,24 @@ df_stat2 <- data.frame(
 
 # Todo: combine these plot into a single of graph (4 panels 2x2)
 
-#option1
-install.packages("gridExtra")
-library(gridExtra)
-plot1 <-ggplot(data = df_stat1, aes(x = idx, y = nf)) + geom_bar(stat = "identity", color = "blue")
-plot2 <-ggplot(data = df_stat1, aes(x = idx, y = nb)) + geom_bar(stat = "identity", color = "blue")
-plot3 <-ggplot(data = df_stat1, aes(x = idx, y = eq)) + geom_bar(stat = "identity", color = "blue")
-plot4 <-ggplot(data = df_stat2, aes(x = idx, y = eq)) + geom_bar(stat = "identity", color = "blue")
-grid.arrange (plot1, plot2, plot3, plot4)
-
-#option2 
+# Combine these plot into a single of graph (4 panels 2x2)
 par(mfrow = c(2, 2))
-plot(df_stat1$nf, type = "l", xlab = "Time", ylab = "French Queue Length", main = "the french queues")
-plot(df_stat1$nb, type = "l", xlab = "Time", ylab = "British Queue Length", main = "the british queues")
-plot(df_stat1$eq, type = "l", xlab = "Time", ylab = "Expected Queuing Time", main = "the expected waiting time")
-plot(df_stat2$eq, type = "l", xlab = "Time", ylab = "Expected Queuing Time(tmb = 40)", main = "the expected waiting time (tmb = 40)")
+plot(df_stat1$nf, type = "l", xlab = "Time", ylab = "avg. queue length", main = "The Avg. Queue length Changing \n Over Time (tmb = 30)", col = "red")
+lines(df_stat1$nb, col = "blue")
+legend(x = "topleft",inset = 0, legend = c("French", "British"), col=c('Red', 'Blue'), lwd=5, cex=.5, horiz = TRUE)
+plot(df_stat1$eq, type = "l", xlab = "Time", ylab = "Expected Queuing Time", main = "The Expected Waiting Time (tmb = 30)")
+plot(df_stat2$nf, type = "l", xlab = "Time", ylab = "avg. queue length", main = "The Avg. Queue length Changing \n Over Time (tmb = 40)", col = "red")
+lines(df_stat2$nb, col = "blue")
+legend(x = "topleft",inset = 0, legend = c("French", "British"), col=c('Red', 'Blue'), lwd=5, cex=.5, horiz = TRUE)
+plot(df_stat2$eq, type = "l", xlab = "Time", ylab = "Expected Queuing Time", main = "The Expected Waiting Time (tmb = 40)")
 
 
-
-
-
-
-
-
+# Simulation through 100 iterations with default parameters
+sim100 <- c()
+for (i in 1:100){
+    iter_res = qsim(mf = 5, mb = 5, a.rate = .1, trb = 40, trf = 40, tmb = 30, tmf = 30, maxb = 20)
+    gt_0 <- (res1$nf[7200]+res1$nb[7200])>0
+    sim100 <- c(sim100, gt_0)
+}
+probability_missing_car = which(sim100==TRUE)/100
+length(sim100)
