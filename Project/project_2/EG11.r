@@ -132,8 +132,8 @@ qsim <- function(mf = 5, mb = 5, a.rate = .1, trb = 40, trf = 40, tmb = 30, tmf 
 
         # Statistic
         #mean_proc_time_french <- mean(france_station$ptime)
-        mean_proc_time_french <- (trf + tmf + trf)/2
         #mean_proc_time_british <- mean(british_station$ptime)
+        mean_proc_time_french <- (trf + tmf + trf)/2
         mean_proc_time_british <- (trb + tmb + trb)/2
 
         nf <- c(nf, mean(france_station$queue))
@@ -181,8 +181,9 @@ plot(df_stat2$eq, type = "l", xlab = "Time", ylab = "Expected Queuing Time", mai
 sim100 <- c()
 for (i in 1:100){
     iter_res = qsim(mf = 5, mb = 5, a.rate = .1, trb = 40, trf = 40, tmb = 30, tmf = 30, maxb = 20)
-    gt_0 <- (res1$nf[7200]+res1$nb[7200])>0
+    gt_0 <- (iter_res$nf[7200]+iter_res$nb[7200])>0
     sim100 <- c(sim100, gt_0)
 }
 probability_missing_car = which(sim100==TRUE)/100
-length(sim100)
+# Proabbility of at least 1 car left
+cat(probability_missing_car)
