@@ -1,7 +1,7 @@
 # the proportion of the work is equally assigned to each team member
 
 library(ggplot2)
-
+set.seed(100000)
 slot_checker <- function(df_station, max_queue) {
     # Function to check the available slot in the station
     # Parameters:
@@ -47,6 +47,7 @@ process_a_car <- function(state, df_station, pmin, pmax) {
     df_station["next_car"] <- state <= df_station$next_state
 
     available_station <- which(df_station$next_car == TRUE & df_station$queue > 0)
+    total_available_station <- length(available_station)
 
     processing_time <- runif(total_available_station, min = pmin, max = pmax)
     processing_time <- ceiling(processing_time)
@@ -143,11 +144,6 @@ qsim <- function(mf = 5, mb = 5, a.rate = .1, trb = 40, trf = 40, tmb = 30, tmf 
 
 res1 <- qsim(mf = 5, mb = 5, a.rate = .1, trb = 40, trf = 40, tmb = 30, tmf = 30, maxb = 20)
 res2 <- qsim(mf = 5, mb = 5, a.rate = .1, trb = 40, trf = 40, tmb = 40, tmf = 30, maxb = 20)
-### discussion of the implications of small extra delays in British checking
-# The average queue length change over time at British Station shows an increase.
-# A small increase in extra delays of 10 seconds leads to a significant rise in the mean of average queue length change over time from 0.46 to 2.22.
-# This means that a 20% increase in extra delays causes a nearly 38% increase in the mean of average queue length change over time.
-# Similarly, the mean of expected waiting time for the whole system also increases by nearly 36%, from 1051.74 to 1432.54.
 
 df_stat1 <- data.frame(
     time = 1:7200,
@@ -178,16 +174,22 @@ plot(df_stat2$eq, type = "l", xlab = "Time", ylab = "Expected Queuing Time", mai
 simulations <- c()
 n_simulation <- 100
 for (i in 1:n_simulation) {
-    iter_res <- qsim(mf = 5, mb = 5, a.rate = .1, trb = 40, trf = 40, tmb = 40, tmf = 30, maxb = 20)
+    iter_res <- qsim(mf = 5, mb = 5, a.rate = .1, trb = 40, trf = 40, tmb = 30, tmf = 30, maxb = 20)
     gt_0 <- (iter_res$nf[7200] + iter_res$nb[7200]) > 0
     simulations <- c(simulations, gt_0)
 }
-probability_missing_car <- sum(simulations) / n_simulation
 # Proabbility of at least 1 car left
-cat(probability_missing_car)
+probability_missing_car <- sum(simulations) / n_simulation
+probability_missing_car
 
+### a brief discussion of the implications of small extra delays in British checking
+# The average queue length change over time at British Station shows an increase.
+# A small increase in extra delays of 10 seconds leads to a significant rise in the mean of average queue length change over time from 0.46 to 2.22.
+# This means that a 20% increase in extra delays causes a nearly 38% increase in the mean of average queue length change over time.
+# Similarly, the mean of expected waiting time for the whole system also increases by nearly 36%, from 1051.74 to 1432.54.
+# In short, a small extra delays in British checking will caused a increasing of expected waiting time and average queue length change over time.
 
-# Findings: 
+# Another Findings: 
 #1. We saw the probability of at least there is one missing car with the default parameter on 100runs is 0. We could get a higher probability by increasing the `a.rate`. All of 100 simulation have at least 1 car left if we doubled the a.rate (0.2)
-#2. We noticed that by using default parameters, which the distribution of processing time between French and British stations are the same, it made the British statios never reach maximum queue (20cars). We can either add more stations on the French or reduce number of British station.
-#3. We optimized our initial code that reduced the time duration (@simulation) from 6s to 0.8s by reducing the dataframe size, slicing using `which`, and use df$col instead of df['col']. Further, this finding could be a rule of thumb of utilizing dataframe.
+#2. We noticed that by using default parameters, which the distribution of processing time between French and British stations are the same, it made the British stations never reach maximum queue (20cars). We can either add more stations on the French or reduce number of British station.
+#3. We optimized our initial code that reduced the time duration (@simulation) from 6s to 0.8s by reducing the data frame size, slicing using `which`, and use df$col instead of df['col']. Further, this finding could be a rule of thumb of utilizing data frame.
