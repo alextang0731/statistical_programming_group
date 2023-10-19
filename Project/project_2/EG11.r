@@ -130,9 +130,7 @@ qsim <- function(mf = 5, mb = 5, a.rate = .1, trb = 40, trf = 40, tmb = 30, tmf 
 
         british_station <- process_a_car(british_station, pmin = tmb, pmax = tmb + trb)
 
-        # Statistic
-        #mean_proc_time_french <- mean(france_station$ptime)
-        #mean_proc_time_british <- mean(british_station$ptime)
+        # Statistic of processing time, derived from mean of uniform distribution
         mean_proc_time_french <- (trf + tmf + trf)/2
         mean_proc_time_british <- (trb + tmb + trb)/2
 
@@ -150,20 +148,17 @@ res1 <- qsim(mf = 5, mb = 5, a.rate = .1, trb = 40, trf = 40, tmb = 30, tmf = 30
 res2 <- qsim(mf = 5, mb = 5, a.rate = .1, trb = 40, trf = 40, tmb = 40, tmf = 30, maxb = 20)
 
 df_stat1 <- data.frame(
+    time = 1:7200,
     nf = unlist(res1$nf),
     nb = unlist(res1$nb),
-    eq = unlist(res1$eq),
-    idx = 1:7200
+    eq = unlist(res1$eq)
 )
 df_stat2 <- data.frame(
+    time = 1:7200,
     nf = unlist(res2$nf),
     nb = unlist(res2$nb),
-    eq = unlist(res2$eq),
-    idx = 1:7200
+    eq = unlist(res2$eq)
 )
-
-
-# Todo: combine these plot into a single of graph (4 panels 2x2)
 
 # Combine these plot into a single of graph (4 panels 2x2)
 par(mfrow = c(2, 2))
@@ -178,12 +173,13 @@ plot(df_stat2$eq, type = "l", xlab = "Time", ylab = "Expected Queuing Time", mai
 
 
 # Simulation through 100 iterations with default parameters
-sim100 <- c()
-for (i in 1:100){
+simulations <- c()
+n_simulation <- 100
+for (i in 1:n_simulation){
     iter_res = qsim(mf = 5, mb = 5, a.rate = .1, trb = 40, trf = 40, tmb = 30, tmf = 30, maxb = 20)
     gt_0 <- (iter_res$nf[7200]+iter_res$nb[7200])>0
-    sim100 <- c(sim100, gt_0)
+    simulations <- c(simulations, gt_0)
 }
-probability_missing_car = which(sim100==TRUE)/100
+probability_missing_car = sum(simulations)/n_simulation
 # Proabbility of at least 1 car left
 cat(probability_missing_car)
