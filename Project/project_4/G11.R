@@ -28,7 +28,7 @@ forward <- function(nn,inp){
     #W^l_j * h^l
     output <- unlist(lapply(w[[l]], function(W) sum(W * out[[l]])))
     
-    #+b^l
+    #+b^l and apply ReLu function
     out[[l+1]] <- relu(output + b[[l]])
   }
   
