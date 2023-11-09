@@ -1,3 +1,4 @@
+#s2120762 yuna choi
 netup <- function(d){
   h <- as.list(d)
   W <- list()
