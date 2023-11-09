@@ -11,10 +11,6 @@ netup <- function(d){
   list(h = h, W = W, b = b)
 }
 
-# ReLU function
-relu <- function(x) {
-  return(pmax(0, x))
-}
 
 out <- list()
 forward <- function(nn,inp){
@@ -29,7 +25,7 @@ forward <- function(nn,inp){
     output <- unlist(lapply(w[[l]], function(W) sum(W * out[[l]])))
     
     #+b^l and apply ReLu function
-    out[[l+1]] <- relu(output + b[[l]])
+    out[[l+1]] <- pmax(0,(output + b[[l]]))
   }
   
   #SoftMax application
