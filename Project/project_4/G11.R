@@ -1,3 +1,4 @@
+#s2595944 Alex Tang
 #s2120762 yuna choi
 netup <- function(d){
   h <- as.list(d)
@@ -35,7 +36,3 @@ forward <- function(nn,inp){
   results <-  exp(out[[length(out)]])/sum(exp(unlist(out[[length(out)]])))
   return(results)
 }
-
-re <- netup(c(4,8,7,3))
-f <- forward(re, c(1,2,3,4))
-
