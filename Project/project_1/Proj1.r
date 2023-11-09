@@ -19,7 +19,7 @@ m <- 1000 # threshold number of occurrences
 
 ## Preparation
 # Load the dataset
-a <- scan("./resource/4300-0.txt", what = "character", skip = 73, nlines = 32858 - 73)
+a <- scan("/Users/yunana/statistical_programming_group/Project/project_1/resource/4300-0.txt", what = "character", skip = 73, nlines = 32858 - 73)
 
 # Select the content by removing certain text by pattern i.e., removing text vefore "_("
 a <- gsub("_(", "", a, fixed = TRUE) ## remove "_("
