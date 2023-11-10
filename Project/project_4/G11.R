@@ -1,5 +1,21 @@
-#s2595944 Alex Tang
-#s2120762 yuna choi
+###Group Members:
+#Group 11
+#1. Alex Tang s2592944
+#2. Alim Hanif s2442474
+#3. Yuna Choi s2120762
+
+###Contributions:
+#netup function : Alex
+#forward function: Yuna and Alex
+#backward and train function: Alim
+
+
+#=======================================================#
+#Overview:
+
+#=======================================================#
+
+#netup function
 netup <- function(d){
   h <- as.list(d)
   W <- list()
@@ -12,8 +28,9 @@ netup <- function(d){
 }
 
 
-out <- list()
+#forward function
 forward <- function(nn,inp){
+  out <- list()
   output <- c()
   out[[1]] <- inp
   h <- nn$h
@@ -23,12 +40,20 @@ forward <- function(nn,inp){
     
     #W^l_j * h^l
     output <- unlist(lapply(w[[l]], function(W) sum(W * out[[l]])))
+    output <- output +  b[[l]]
+    if (l == (length(nn$h)-1)){
+      #SoftMax application
+      out[[l+1]] <-  exp(output)/sum(exp(output))
+    }else{
+      #apply ReLu function
+      out[[l+1]] <- pmax(0,(output))
+    }
     
-    #+b^l and apply ReLu function
-    out[[l+1]] <- pmax(0,(output + b[[l]]))
+    
   }
-  
-  #SoftMax application
-  results <-  exp(out[[length(out)]])/sum(exp(unlist(out[[length(out)]])))
-  return(results)
+  return(out)
 }
+
+
+
+
