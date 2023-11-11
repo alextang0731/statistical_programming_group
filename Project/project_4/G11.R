@@ -21,8 +21,9 @@ netup <- function(d) {
   h <- list()
   W <- list()
   b <- list()
+  h[[1]] <- rep(c(0), d[1])
   for (i in 1:(length(d) - 1)) {
-    h[[i]] <- rep(c(0), d[i + 1])
+    h[[i+1]] <- rep(c(0), d[i + 1])
     # W[[i]] <- runif(d[i+1], 0, 0.2)
     W[[i]] <- matrix(runif(d[i] * d[i + 1], 0, 0.2), ncol = d[i + 1])
     b[[i]] <- runif(d[i + 1], 0, 0.2)
@@ -43,14 +44,16 @@ relu <- function(X) {
 # forward function
 forward <- function(nn, inp) {
   h_prev <- matrix(unlist(iris[, 1:4]), ncol = 4)
-  for (l in 1:length(nn$h)) {
-    if (l != length(nn$h)) {
-      nn$h[[l]] <- relu(h_prev %*% nn$W[[l]]) + nn$b[[l]]
+  nn$h[[1]] <- h_prev
+  for (l in 1:length(nn$W)) {
+    if (l != length(nn$W)) {
+      nn$h[[l+1]] <- relu(h_prev %*% nn$W[[l]]) + nn$b[[l]]
     } else {
-      nn$h[[l]] <- softmax(h_prev %*% nn$W[[l]]) + nn$b[[l]]
+      nn$h[[l+1]] <- softmax(h_prev %*% nn$W[[l]]) + nn$b[[l]]
     }
-    h_prev <- nn$h[[l]]
+    h_prev <- nn$h[[l+1]]
   }
+  class(nn)
   return(nn)
 }
 
