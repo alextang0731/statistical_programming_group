@@ -42,19 +42,16 @@ relu <- function(X) {
 
 # forward function
 forward <- function(nn, inp) {
-  h <- nn$h
-  w <- nn$W
-  b <- nn$b
   h_prev <- matrix(unlist(iris[, 1:4]), ncol = 4)
-  for (l in 1:length(h)) {
-    if (l != length(h)) {
-      h[[l]] <- relu(h_prev %*% w[[l]]) + b[[l]]
+  for (l in 1:length(nn$h)) {
+    if (l != length(nn$h)) {
+      nn$h[[l]] <- relu(h_prev %*% nn$W[[l]]) + nn$b[[l]]
     } else {
-      h[[l]] <- softmax(h_prev %*% w[[l]]) + b[[l]]
+      nn$h[[l]] <- softmax(h_prev %*% nn$W[[l]]) + nn$b[[l]]
     }
-    h_prev <- h[[l]]
+    h_prev <- nn$h[[l]]
   }
-  return(h)
+  return(nn)
 }
 
 
