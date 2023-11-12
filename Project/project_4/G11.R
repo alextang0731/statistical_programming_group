@@ -187,9 +187,9 @@ main <- function() {
     train(nn,inp = X_train,k = y_train,eta = .01,mb = 10,nstep = 10000)
 
   nn <- forward(nn, X_test)
-  offset_layer = length(nn$h)
-  y_pred <- nn$h[[offset_layer]]
-  y_pred <- apply(y_pred, 1, which.max)
+  offset_layer <- length(nn$h)
+  y_prob <- nn$h[[offset_layer]]
+  y_pred <- apply(y_prob, 1, which.max)
   classDF <- cbind(y_test,y_pred)
   cat("Two Way Contingency Table: \n")
   print(xtabs(~y_test+y_pred, data=classDF))
