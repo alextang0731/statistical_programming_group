@@ -170,8 +170,8 @@ main <- function() {
   #d <- c(4, 64, 32, 3)
   nn <- netup(d)
   
-  ratio_train <- 0.8
-  idx_train <- sample(nrow(iris), ratio_train * nrow(iris))
+  #ratio_train <- 0.8
+  #idx_train <- sample(nrow(iris), ratio_train * nrow(iris))
   
   #train_df <- iris[idx_train, ]
   #test_df <- iris[-idx_train, ]
@@ -185,11 +185,16 @@ main <- function() {
   
   nn <-
     train(nn,inp = X_train,k = y_train,eta = .01,mb = 10,nstep = 10000)
-  nn <- forward(nn, X_train)
-  
+
+  nn <- forward(nn, X_test)
   offset_layer = length(nn$h)
   y_pred <- nn$h[[offset_layer]]
-  
+  y_pred <- apply(y_pred, 1, which.max)
+  classDF <- cbind(y_test,y_pred)
+  cat("Two Way Contingency Table: \n")
+  print(xtabs(~y_test+y_pred, data=classDF))
+  miss_event <- sum(y_test != y_pred)
+  print(paste("Misclassification Rate: ", miss_event/nrow(classDF)))
 }
 
 system.time(main())
