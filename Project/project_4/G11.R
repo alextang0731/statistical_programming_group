@@ -163,7 +163,8 @@ main <- function() {
   nn <- train(nn, inp = X_train, k = y_train, eta = .01, mb = 10, nstep = 10000)
   nn <- forward(nn, X_train)
 
-  y_pred <- nn$h[[5]]
+  offset_layer = length(nn$h)
+  y_pred <- nn$h[[offset_layer]]
 }
 
 main()
