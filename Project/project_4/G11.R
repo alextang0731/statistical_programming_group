@@ -12,7 +12,10 @@
 
 # =======================================================#
 # Overview:
-
+# The code generates and trains a neural network using stochastic gradient descent,
+# involves iteratively updating the network's weights and biases based on the 
+# gradients of the loss function, computed using small batches of training data.
+# After that, it uses the "iris" dataset and trains a 4-8-7-3 network as an example.
 # =======================================================#
 
 set.seed(0)
@@ -87,7 +90,7 @@ backward <- function(nn, k) {
   n_weight <- length(nn$W)
   n_h <- length(nn$h)
   batch_size <- length(k)
-  
+
   k_matrix <-
     matrix(0, nrow = nrow(nn$h[[n_h]]), ncol = ncol(nn$h[[n_h]]))
   k_matrix[cbind(1:length(k), k)] <- 1
@@ -190,3 +193,4 @@ main <- function() {
 }
 
 system.time(main())
+
