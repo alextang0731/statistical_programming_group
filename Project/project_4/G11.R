@@ -190,11 +190,9 @@ main <- function() {
   offset_layer <- length(nn$h)
   y_prob <- nn$h[[offset_layer]]
   y_pred <- apply(y_prob, 1, which.max)
-  classDF <- cbind(y_test,y_pred)
-  cat("Two Way Contingency Table: \n")
-  print(xtabs(~y_test+y_pred, data=classDF))
+  print(table(y_test,y_pred))
   miss_event <- sum(y_test != y_pred)
-  print(paste("Misclassification Rate: ", miss_event/nrow(classDF)))
+  print(paste("Misclassification Rate: ", miss_event/length(y_test)))
 }
 
 system.time(main())
