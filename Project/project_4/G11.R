@@ -22,6 +22,11 @@ set.seed(0)
 
 # netup function
 netup <- function(d) {
+  # Function to 
+  # Parameter:
+  #   - 
+  # Return:
+  #   -
   
   #a vector of length d[l] which will contain the node values for layer l
   h <- list()
@@ -50,6 +55,12 @@ softmax <- function(X) {
 
 #ReLU transformation
 relu <- function(X) {
+  # Function to 
+  # Parameter:
+  #   - 
+  # Return:
+  #   -
+  
   result <- pmax(0, X)
   result <- matrix(result, ncol = ncol(X))
   return(result)
@@ -57,6 +68,12 @@ relu <- function(X) {
 
 # forward function
 forward <- function(nn, inp) {
+  # Function to 
+  # Parameter:
+  #   - 
+  # Return:
+  #   -
+  
   h_prev <- inp
   nn$h[[1]] <- h_prev
   for (l in 1:length(nn$W)) {
@@ -78,6 +95,13 @@ forward <- function(nn, inp) {
 }
 
 relu_derivative <- function(x) {
+  # Function to 
+  # Parameter:
+  #   - 
+  # Return:
+  #   -
+  
+  #when it is smaller than or equal to zero, it will become 0
   x[x <= 0] <- 0
   x[x > 0] <- 1
   return(x)
@@ -85,32 +109,51 @@ relu_derivative <- function(x) {
 
 #Backward function
 backward <- function(nn, k) {
+  # Function to 
+  # Parameter:
+  #   - 
+  # Return:
+  #   - 
+  
   
   #number of weight and h
   n_weight <- length(nn$W)
   n_h <- length(nn$h)
   batch_size <- length(k)
-
+  
   k_matrix <-
     matrix(0, nrow = nrow(nn$h[[n_h]]), ncol = ncol(nn$h[[n_h]]))
+  
+  #searching when j equal to k_i
   k_matrix[cbind(1:length(k), k)] <- 1
   
   dh <- list()
   dW <- list()
   db <- list()
   
+  #cases when j not equal to k_i
   d_L <- nn$h[[n_weight + 1]]
+  #cases when j equal to k_i
   d_L <- (d_L - k_matrix)
   
+  #last layers nodes derivatives, including W and b
   dh[[n_weight + 1]] <- d_L 
-  dW[[n_weight]] <- t(nn$h[[n_weight]]) %*% d_L * (1 / batch_size)
+  
+  #average the derivatives for each i in the set
+  dW[[n_weight]] <- ((t(nn$h[[n_weight]]) %*% d_L)/ batch_size)
   db[[n_weight]] <- colMeans(d_L)
   
+  #the derivatives of intermediate layer(s) start from second last layer
   for (l in (n_weight):2) {
+    
+    #when h is smaller than zero, it will become 0
     dh[[l]] <-
       dh[[l + 1]] %*% t(nn$W[[l]]) * relu_derivative(nn$h[[l]])
-    dW[[l - 1]] <- t(nn$h[[l - 1]]) %*% dh[[l]] * (1 / batch_size)
+    
+    #average the derivatives for each i in the set
+    dW[[l - 1]] <- ((t(nn$h[[l - 1]]) %*% dh[[l]])/ batch_size)
     db[[l - 1]] <- colMeans(dh[[l]])
+    
   }
   nn$dh <- dh
   nn$dW <- dW
@@ -122,7 +165,21 @@ backward <- function(nn, k) {
 
 
 train <- function(nn,inp,k,eta = .01,mb = 10,nstep = 10000) {
+  # Function to train the model
+  # Parameter:
+  #   - 
+  # Return:
+  #   - 
+  
   grad_update <- function(x, y, step_size) {
+    # Function to update the W and b
+    # Parameter:
+    #   - x : list of previous layer(s)
+    #   - y : list of derivative layer(s)
+    #   -step_size: the step size that is eta
+    # Return:
+    #   - return the updated values
+    
     x - (step_size * y)
   }
   
@@ -145,18 +202,15 @@ train <- function(nn,inp,k,eta = .01,mb = 10,nstep = 10000) {
     y_pred <- nn$h[output_layer_idx][[1]]
     y_pred_int <- apply(y_pred, 1, which.max)
     miss_event <- sum(y_train_mb != y_pred_int)
-    
+
     n_miss_event <- n_miss_event + miss_event
-    
+
     if (step %% 100 == 0) {
       miss_class <- n_miss_event / (step * mb)
       msg <- paste("Step: ", step, ". MissClass: ", miss_class)
       print(msg)
     }
   }
-  # print(y_pred)
-  # print(y_pred_int)
-  # print(y_train_mb)
   return(nn)
 }
 
@@ -165,10 +219,13 @@ main <- function() {
   data(iris)
   vocabs <- c(unique(iris[, 5]))
   iris$k <- match(iris[, 5], vocabs)
+  
+  #setup the
   d <- c(4, 8, 7, 3)
   # Best Setup so far
   #d <- c(4, 64, 32, 3)
   nn <- netup(d)
+  print(nn)
   
   #ratio_train <- 0.8
   #idx_train <- sample(nrow(iris), ratio_train * nrow(iris))
@@ -196,4 +253,8 @@ main <- function() {
 }
 
 system.time(main())
+# Rprof()
+# main()
+# Rprof(NULL)
+# summaryRprof()
 
