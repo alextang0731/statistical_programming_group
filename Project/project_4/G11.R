@@ -77,7 +77,7 @@ grad_update <- function(wb, grad, eta) {
   return(wb - (eta * grad))
 }
 
-# === Main Functions ======
+# ====== Main Functions ======
 
 netup <- function(d) {
   # Function to setup the Neural Network (NN)
@@ -89,7 +89,7 @@ netup <- function(d) {
   #     -> W: the weight matrix linking layer l to layer l+1
   #     -> b: the list of vector bias
   
-  # Setup placeholder for h, W, and n.
+  # Setup placeholder for h, W, and b.
   h <- list()
   W <- list()
   b <- list()
