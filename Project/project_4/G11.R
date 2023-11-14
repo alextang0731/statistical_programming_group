@@ -88,7 +88,7 @@ netup <- function(d) {
   #     -> W: the weight matrix linking layer l to layer l+1
   #     -> b: the list of vector bias
 
-  # Setup placeholder for h,W, and n.
+  # Setup placeholder for h, W, and n.
   h <- list()
   W <- list()
   b <- list()
@@ -193,8 +193,9 @@ train <- function(nn, inp, k, eta = .01, mb = 10, nstep = 10000) {
   n_miss_event <- 0 # for display
 
   # Training loop for nsteps
+  n_data <- nrow(inp)
   for (step in 1:nstep) {
-    mb_indices <- sample(nrow(inp), mb)
+    mb_indices <- sample(n_data, mb)
     X_train_mb <- inp[mb_indices, ]
     y_train_mb <- k[mb_indices]
 
