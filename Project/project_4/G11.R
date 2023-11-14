@@ -88,7 +88,7 @@ netup <- function(d) {
   #     -> W: the weight matrix linking layer l to layer l+1
   #     -> b: the list of vector bias
 
-  # Setup placeholder for h, W, and n.
+  # Setup placeholder for h, W, and b.
   h <- list()
   W <- list()
   b <- list()
