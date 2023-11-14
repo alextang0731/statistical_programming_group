@@ -26,10 +26,10 @@
 
 
 # Note: this code encode the labels into an integer [1,2,3]
-#  as it is a multi-class label task.
+#       as it is a multi-class label task.
 # =======================================================#
 
-# === Utilities ==========
+# ====== Utilities ======
 
 softmax <- function(X) {
   # Function to implement Softmax function: exp(x)/ sum(exp(x))
@@ -208,7 +208,7 @@ train <- function(nn, inp, k, eta = .01, mb = 10, nstep = 10000) {
     nn$W <- Map(grad_update, nn$W, nn$dW, eta)
     nn$b <- Map(grad_update, nn$b, nn$db, eta)
     
-    # Disclaimer!!
+    # Disclaimer!!!
     # We wrote the code below to monitor the metrics during training.
     # We hard-coded it to be `FALSE`, because it is not required
     # in the practical 4 sheet and the data is SMALL.
@@ -234,14 +234,14 @@ train <- function(nn, inp, k, eta = .01, mb = 10, nstep = 10000) {
   return(nn)
 }
 
-# === Demonstrate the NN Model training on Iris Dataset ======
+# === Demonstrate the Neural Network (NN) Model training on Iris Dataset ===
 
-data(iris)
 set.seed(0)
+data(iris)
 vocabs <- c(unique(iris[, 5]))
 iris$k <- match(iris[, 5], vocabs)
 
-# setup the NN architecture
+# setup the Neural Network (NN) architecture
 d <- c(4, 8, 7, 3)
 nn <- netup(d)
 offset_layer <- length(nn$h)
@@ -250,7 +250,7 @@ offset_layer <- length(nn$h)
 train_df <- iris[-seq(5, nrow(iris), 5), ]
 test_df <- iris[seq(5, nrow(iris), 5), ]
 
-# Preprocess the data: Transofrm into matrix & vector
+# Preprocess the data: Transform into matrix & vector
 X_train <- matrix(unlist(train_df[, 1:4]), ncol = 4)
 y_train <- train_df$k
 X_test <- matrix(unlist(test_df[, 1:4]), ncol = 4)
