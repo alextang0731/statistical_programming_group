@@ -122,7 +122,7 @@ forward <- function(nn, inp) {
       nn$h[[l + 1]] <- relu((h_prev %*% nn$W[[l]]) + nn$b[[l]])
     } else {
       # apply SoftMax function to the output layer
-      nn$h[[l + 1]] <- softmax((h_prev %*% nn$W[[l]] + nn$b[[l]]))
+      nn$h[[l + 1]] <- softmax((h_prev %*% nn$W[[l]]) + nn$b[[l]])
     }
     
     h_prev <- nn$h[[l + 1]]
@@ -295,9 +295,19 @@ print(nn)
 train_df <- BreastCancer[-seq(5, nrow(BreastCancer), 5), ]
 test_df <- BreastCancer[seq(5, nrow(BreastCancer), 5), ]
 X_train <- matrix(unlist(train_df[, 1:9]), ncol = 9)
-y_train <- train_df$k
+X_train = as.numeric(X_train)
+X_train[is.na(X_train)] = 0
+X_train = matrix(X_train, ncol = 9)
+
+y_train <- train_df$k # TODO: CHANGE THIS
 X_test <- matrix(unlist(test_df[, 1:9]), ncol = 9)
-y_test <- test_df$k
+
+X_test = as.numeric(X_test)
+X_test[is.na(X_test)] = 0
+
+X_test = matrix(X_test, ncol = 9)
+
+y_test <- test_df$k # TODO: CHANGE THIS
 n_val_data <- length(y_test)
 
 nn <- forward(nn, X_test)
