@@ -32,7 +32,7 @@
 # === Utilities ==========
 
 softmax <- function(X) {
-  # Function to implement softmax function: exp(x)/ sum(exp(x))
+  # Function to implement Softmax function: exp(x)/ sum(exp(x))
   # Arguments:
   #   - X: input vector/matrix
   # Return:
@@ -118,7 +118,7 @@ forward <- function(nn, inp) {
   nn$h[[1]] <- h_prev
   for (l in 1:length(nn$W)) {
     if (l != length(nn$W)) {
-      # apply ReLu function on intermediate layers
+      # apply ReLU function on intermediate layers
       nn$h[[l + 1]] <- relu((h_prev %*% nn$W[[l]]) + nn$b[[l]])
     } else {
       # apply SoftMax function to the output layer
