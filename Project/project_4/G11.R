@@ -240,6 +240,7 @@ set.seed(0)
 data(iris)
 vocabs <- c(unique(iris[, 5]))
 iris$k <- match(iris[, 5], vocabs)
+head(iris)
 
 # setup the Neural Network (NN) architecture
 d <- c(4, 8, 7, 3)
@@ -276,3 +277,31 @@ miss_event_post <- sum(y_test != y_pred_post)
 
 print(paste("[Pre] Misclassification Rate: ", miss_event_pre / n_val_data))
 print(paste("[Post] Misclassification Rate: ", miss_event_post / n_val_data))
+
+install.packages("mlbench")
+library(mlbench)
+data(BreastCancer) 
+dim(BreastCancer) 
+levels(BreastCancer$Class) 
+vocabs <- c(unique(BreastCancer[, 11]))
+BreastCancer$k <- match(BreastCancer[, 11], vocabs)
+BreastCancer <- BreastCancer[,2:12]
+head(BreastCancer)
+
+d <- c(9, 6, 7, 2)
+nn <- netup(d)
+offset_layer <- length(nn$h)
+print(nn)
+train_df <- BreastCancer[-seq(5, nrow(BreastCancer), 5), ]
+test_df <- BreastCancer[seq(5, nrow(BreastCancer), 5), ]
+X_train <- matrix(unlist(train_df[, 1:9]), ncol = 9)
+y_train <- train_df$k
+X_test <- matrix(unlist(test_df[, 1:9]), ncol = 9)
+y_test <- test_df$k
+n_val_data <- length(y_test)
+
+nn <- forward(nn, X_test)
+y_prob_pre <- nn$h[[offset_layer]]
+y_pred_pre <- apply(y_prob_pre, 1, which.max)
+miss_event_pre <- sum(y_test != y_pred_pre)
+
