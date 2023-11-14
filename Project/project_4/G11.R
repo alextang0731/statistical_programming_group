@@ -24,8 +24,8 @@
 # 4-8-7-3 network as an example. The task is to predict the Species.
 
 
-# Note: As the labels are multi-class, this code will encode into an
-# integer [1,2,3].
+# Note: this code encode the labels into an integer [1,2,3]
+#  as it is a multi-class label task.
 # =======================================================#
 
 # === Utilities ==========
