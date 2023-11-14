@@ -4,6 +4,8 @@
 # 2. Alim Hanif s2442474
 # 3. Yuna Choi s2120762
 
+# Github Repository: https://github.com/alextang0731/statistical_programming_group/blob/main/Project/project_4/G11.R
+
 ### Contributions:
 # netup function : Alex
 # forward function: Yuna and Alex
@@ -18,15 +20,62 @@
 # After that, it uses the "iris" dataset and trains a 4-8-7-3 network as an example.
 # =======================================================#
 
-set.seed(0)
+# Utils for computation
+softmax <- function(X) {
+  # Function to implement softmax function: exp(x)/ sum(exp(x))
+  # Arguments:
+  #   - X: input vector/matrix
+  # Return:
+  #   - X after softmax function has been implemented.
+  return(exp(X) / rowSums(exp(X)))
+}
+
+#ReLU transformation
+relu <- function(X) {
+  # Function to implement ReLu function: max(0, X)
+  # Arguments:
+  #   - X: input vector/matrix
+  # Return:
+  #   - X after ReLu function has been implemented.
+  
+  result <- pmax(0, X)
+  result <- matrix(result, ncol = ncol(X))
+  return(result)
+}
+
+relu_derivative <- function(x) {
+  # Function to calcuate the derivative of ReLu
+  # Arguments:
+  #   - X: input vector/matrix
+  # Return:
+  #   - X after derivative of ReLu function has been implemented.
+  
+  #when it is smaller than or equal to zero, it will become 0
+  x[x <= 0] <- 0
+  x[x > 0] <- 1
+  return(x)
+}
+
+grad_update <- function(wb, grad, eta) {
+  # Function to update the parameters
+  # Arguments:
+  #   - wb : list of parameters at the current time
+  #   - grad : list of gradient to be implemented to wb
+  #   - eta: the step size.
+  # Return:
+  #   - return the updated parameters
+  
+  return(wb - (eta * grad))
+}
+
 
 # netup function
 netup <- function(d) {
-  # Function to 
-  # Parameter:
-  #   - 
+  # Function to setup the Neural Network (NN)
+  # Arguments:
+  #   - d: a vector of number of nodes in each layers
   # Return:
-  #   -
+  #   - nn: Neural Network list
   
   #a vector of length d[l] which will contain the node values for layer l
   h <- list()
@@ -46,33 +95,18 @@ netup <- function(d) {
       matrix(runif(d[i] * d[i + 1], 0, 0.2), ncol = d[i + 1])
     b[[i]] <- runif(d[i + 1], 0, 0.2)
   }
-  list(h = h, W = W, b = b)
-}
-
-softmax <- function(X) {
-  return(exp(X) / rowSums(exp(X)))
-}
-
-#ReLU transformation
-relu <- function(X) {
-  # Function to 
-  # Parameter:
-  #   - 
-  # Return:
-  #   -
-  
-  result <- pmax(0, X)
-  result <- matrix(result, ncol = ncol(X))
-  return(result)
+  nn = list(h = h, W = W, b = b)
+  return(nn)
 }
 
 # forward function
 forward <- function(nn, inp) {
-  # Function to 
-  # Parameter:
-  #   - 
+  # Function to forward-propagation in NN
+  # Arguments:
+  #   - nn: network list
+  #   - inp: vector of input values for the first layer
   # Return:
-  #   -
+  #   - nn: updated NN with computed offset (h) from inp data.
   
   h_prev <- inp
   nn$h[[1]] <- h_prev
@@ -85,7 +119,7 @@ forward <- function(nn, inp) {
     } else {
       
       #transformation of last output layer value to be a probability
-      nn$h[[l + 1]] <- softmax(relu((h_prev %*% nn$W[[l]]) + nn$b[[l]]))
+      nn$h[[l + 1]] <- softmax((h_prev %*% nn$W[[l]] + nn$b[[l]]))
       
     }
     
@@ -94,27 +128,16 @@ forward <- function(nn, inp) {
   return(nn)
 }
 
-relu_derivative <- function(x) {
-  # Function to 
-  # Parameter:
-  #   - 
-  # Return:
-  #   -
-  
-  #when it is smaller than or equal to zero, it will become 0
-  x[x <= 0] <- 0
-  x[x > 0] <- 1
-  return(x)
-}
+
 
 #Backward function
 backward <- function(nn, k) {
-  # Function to 
-  # Parameter:
-  #   - 
+  # Function to perform back-propagation (backward)
+  # Arguments:
+  #   - nn: network list from forward propagation function
+  #   - k: output class k (label)
   # Return:
-  #   - 
-  
+  #   - updated nn with gradient computation for w, b, and h
   
   #number of weight and h
   n_weight <- length(nn$W)
@@ -162,26 +185,17 @@ backward <- function(nn, k) {
   return(nn)
 }
 
-
-
-train <- function(nn,inp,k,eta = .01,mb = 10,nstep = 10000) {
-  # Function to train the model
-  # Parameter:
-  #   - 
+train <- function(nn, inp, k, eta = .01, mb = 10, nstep = 10000) {
+  # Function to train the NN model
+  # Arguments:
+  #   - nn: network list
+  #   - inp: vector of input values for the first layer
+  #   - k: output class k (label)
+  #   - eta: eta: the step size. (default: .01)
+  #   - mb: batch size. (default: 10)
+  #   - nstep: number of step for training. (default: 10000)
   # Return:
-  #   - 
-  
-  grad_update <- function(x, y, step_size) {
-    # Function to update the W and b
-    # Parameter:
-    #   - x : list of previous layer(s)
-    #   - y : list of derivative layer(s)
-    #   -step_size: the step size that is eta
-    # Return:
-    #   - return the updated values
-    
-    x - (step_size * y)
-  }
+  #   - nn: trained model from the input
   
   n_miss_event <- 0
   
@@ -202,59 +216,53 @@ train <- function(nn,inp,k,eta = .01,mb = 10,nstep = 10000) {
     y_pred <- nn$h[output_layer_idx][[1]]
     y_pred_int <- apply(y_pred, 1, which.max)
     miss_event <- sum(y_train_mb != y_pred_int)
-
+    
     n_miss_event <- n_miss_event + miss_event
-
-    if (step %% 100 == 0) {
-      miss_class <- n_miss_event / (step * mb)
-      msg <- paste("Step: ", step, ". MissClass: ", miss_class)
-      print(msg)
-    }
+    
+    # To activate the progress bar during training
+    # if (step %% 100 == 0) {
+    #   miss_class <- n_miss_event / (step * mb)
+    #   msg <- paste("Step: ", step, ". MissClass: ", miss_class)
+    #   print(msg)
+    # }
   }
   return(nn)
 }
 
+data(iris)
+set.seed(0)
+vocabs <- c(unique(iris[, 5]))
+iris$k <- match(iris[, 5], vocabs)
 
-main <- function() {
-  data(iris)
-  vocabs <- c(unique(iris[, 5]))
-  iris$k <- match(iris[, 5], vocabs)
-  
-  #setup the
-  d <- c(4, 8, 7, 3)
-  # Best Setup so far
-  #d <- c(4, 64, 32, 3)
-  nn <- netup(d)
-  print(nn)
-  
-  #ratio_train <- 0.8
-  #idx_train <- sample(nrow(iris), ratio_train * nrow(iris))
-  
-  #train_df <- iris[idx_train, ]
-  #test_df <- iris[-idx_train, ]
-  train_df <- iris[-seq(5, nrow(iris), 5), ]
-  test_df <- iris[seq(5, nrow(iris), 5), ]
-  
-  X_train <- matrix(unlist(train_df[, 1:4]), ncol = 4)
-  y_train <- train_df$k
-  X_test <- matrix(unlist(test_df[, 1:4]), ncol = 4)
-  y_test <- test_df$k
-  
-  nn <-
-    train(nn,inp = X_train,k = y_train,eta = .01,mb = 10,nstep = 10000)
+#setup the
+d <- c(4, 8, 7, 3)
+nn <- netup(d)
+offset_layer <- length(nn$h)
 
-  nn <- forward(nn, X_test)
-  offset_layer <- length(nn$h)
-  y_prob <- nn$h[[offset_layer]]
-  y_pred <- apply(y_prob, 1, which.max)
-  print(table(y_test,y_pred))
-  miss_event <- sum(y_test != y_pred)
-  print(paste("Misclassification Rate: ", miss_event/length(y_test)))
-}
 
-system.time(main())
-# Rprof()
-# main()
-# Rprof(NULL)
-# summaryRprof()
+train_df <- iris[-seq(5, nrow(iris), 5), ]
+test_df <- iris[seq(5, nrow(iris), 5), ]
 
+X_train <- matrix(unlist(train_df[, 1:4]), ncol = 4)
+y_train <- train_df$k
+X_test <- matrix(unlist(test_df[, 1:4]), ncol = 4)
+y_test <- test_df$k
+
+
+# Evaluate the model before training
+nn <- forward(nn, X_test)
+y_prob_pre <- nn$h[[offset_layer]]
+y_pred_pre <- apply(y_prob_pre, 1, which.max)
+miss_event_pre <- sum(y_test != y_pred_pre)
+
+
+nn <-
+  train(nn,inp = X_train,k = y_train,eta = .01,mb = 10,nstep = 10000)
+
+nn <- forward(nn, X_test)
+y_prob_post <- nn$h[[offset_layer]]
+y_pred_post <- apply(y_prob_post, 1, which.max)
+miss_event_post <- sum(y_test != y_pred_post)
+
+print(paste("[Pre] Misclassification Rate: ", miss_event_pre/length(y_test)))
+print(paste("[Post] Misclassification Rate: ", miss_event_post/length(y_test)))
