@@ -278,8 +278,11 @@ miss_event_post <- sum(y_test != y_pred_post)
 print(paste("[Pre] Misclassification Rate: ", miss_event_pre / n_val_data))
 print(paste("[Post] Misclassification Rate: ", miss_event_post / n_val_data))
 
+
+###New Test Example
 install.packages("mlbench")
 library(mlbench)
+set.seed(0)
 data(BreastCancer) 
 dim(BreastCancer) 
 levels(BreastCancer$Class) 
@@ -288,7 +291,7 @@ BreastCancer$k <- match(BreastCancer[, 11], vocabs)
 BreastCancer <- BreastCancer[,2:12]
 head(BreastCancer)
 
-d <- c(9, 6, 7, 2)
+d <- c(9, 18, 7,4, 2)
 nn <- netup(d)
 offset_layer <- length(nn$h)
 print(nn)
@@ -315,3 +318,15 @@ y_prob_pre <- nn$h[[offset_layer]]
 y_pred_pre <- apply(y_prob_pre, 1, which.max)
 miss_event_pre <- sum(y_test != y_pred_pre)
 
+# Model Training (fitting)
+nn <-
+  train(nn, inp = X_train, k = y_train, eta = .01, mb = 10, nstep = 10000)
+
+# Model Inference & calculate the miss-classification rate
+nn <- forward(nn, X_test)
+y_prob_post <- nn$h[[offset_layer]]
+y_pred_post <- apply(y_prob_post, 1, which.max)
+miss_event_post <- sum(y_test != y_pred_post)
+
+print(paste("[Pre] Misclassification Rate: ", miss_event_pre / n_val_data))
+print(paste("[Post] Misclassification Rate: ", miss_event_post / n_val_data))
