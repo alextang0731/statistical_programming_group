@@ -10,10 +10,9 @@
 # /blob/main/Project/project_4/G11.R
 
 ### Contributions:
-# netup function : Alex
-# forward function: Yuna and Alex
-# backward and train function: Alim
-
+# Alex: netup function, forward function, and evaluation of everything
+# Alim: backward function, train function, and evaluation of everything
+# Yuna: forward function
 #Note: Everyone is contributed equally
 
 # =======================================================#
@@ -248,6 +247,59 @@ miss_event_pre <- sum(y_test != y_pred_pre)
 # Model Training (fitting)
 nn <-
   train(nn, inp = X_train, k = y_train, eta = .01, mb = 10, nstep = 10000)
+
+# Model Inference & calculate the miss-classification rate
+nn <- forward(nn, X_test)
+y_prob_post <- nn$h[[offset_layer]]
+y_pred_post <- apply(y_prob_post, 1, which.max)
+miss_event_post <- sum(y_test != y_pred_post)
+
+print(paste("[Pre] Misclassification Rate: ", miss_event_pre / n_val_data))
+print(paste("[Post] Misclassification Rate: ", miss_event_post / n_val_data))
+
+
+###New Test Example
+#install.packages("mlbench")
+library(mlbench)
+set.seed(21)
+data(BreastCancer) 
+dim(BreastCancer) 
+levels(BreastCancer$Class) 
+vocabs <- c(unique(BreastCancer[, 11]))
+BreastCancer$k <- match(BreastCancer[, 11], vocabs)
+BreastCancer <- BreastCancer[,2:12]
+head(BreastCancer)
+
+d <- c(9, 32, 16, 2)
+nn <- netup(d)
+offset_layer <- length(nn$h)
+print(nn)
+train_df <- BreastCancer[-seq(5, nrow(BreastCancer), 5), ]
+test_df <- BreastCancer[seq(5, nrow(BreastCancer), 5), ]
+X_train <- matrix(unlist(train_df[, 1:9]), ncol = 9)
+X_train = as.numeric(X_train)
+X_train[is.na(X_train)] = 0
+X_train = matrix(X_train, ncol = 9)
+
+y_train <- train_df$k # TODO: CHANGE THIS
+X_test <- matrix(unlist(test_df[, 1:9]), ncol = 9)
+
+X_test = as.numeric(X_test)
+X_test[is.na(X_test)] = 0
+
+X_test = matrix(X_test, ncol = 9)
+
+y_test <- test_df$k # TODO: CHANGE THIS
+n_val_data <- length(y_test)
+
+nn <- forward(nn, X_test)
+y_prob_pre <- nn$h[[offset_layer]]
+y_pred_pre <- apply(y_prob_pre, 1, which.max)
+miss_event_pre <- sum(y_test != y_pred_pre)
+
+# Model Training (fitting)
+nn <-
+  train(nn, inp = X_train, k = y_train, eta = .01, mb = 10, nstep = 200000)
 
 # Model Inference & calculate the miss-classification rate
 nn <- forward(nn, X_test)
