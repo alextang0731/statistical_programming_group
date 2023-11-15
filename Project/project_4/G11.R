@@ -13,7 +13,7 @@
 # Alex: netup function, forward function, and evaluation of everything
 # Alim: backward function, train function, and evaluation of everything
 # Yuna: forward function
-#Note: Everyone is contributed equally
+# Note: Everyone is contributed equally
 
 # =======================================================#
 # Overview:
@@ -45,7 +45,7 @@ relu <- function(X) {
   #   - X: input vector/matrix
   # Return:
   #   - X after ReLU function has been implemented.
-  
+
   result <- pmax(0, X)
   result <- matrix(result, ncol = ncol(X))
   return(result)
@@ -57,7 +57,7 @@ relu_derivative <- function(x) {
   #   - X: input vector/matrix
   # Return:
   #   - X after derivative of ReLU function has been implemented.
-  
+
   # when it is smaller than or equal to zero, it will become 0
   x[x <= 0] <- 0
   x[x > 0] <- 1
@@ -72,7 +72,7 @@ grad_update <- function(wb, grad, eta) {
   #   - eta: the step size.
   # Return:
   #   - return the updated parameters
-  
+
   return(wb - (eta * grad))
 }
 
@@ -87,12 +87,12 @@ netup <- function(d) {
   #     -> h: vector of length d[l] contains the nodes for layer l
   #     -> W: the weight matrix linking layer l to layer l+1
   #     -> b: the list of vector bias
-  
+
   # Setup placeholder for h, W, and b.
   h <- list()
   W <- list()
   b <- list()
-  
+
   # Assign the matrix and vector to the placeholder
   h[[1]] <- rep(c(0), d[1])
   for (i in 1:(length(d) - 1)) {
@@ -112,7 +112,7 @@ forward <- function(nn, inp) {
   #   - inp: vector of input values for the first layer
   # Return:
   #   - nn: updated NN with computed offset (h) from inp data.
-  
+
   h_prev <- inp
   nn$h[[1]] <- h_prev
   for (l in 1:length(nn$W)) {
@@ -123,7 +123,7 @@ forward <- function(nn, inp) {
       # apply SoftMax function to the output layer
       nn$h[[l + 1]] <- softmax((h_prev %*% nn$W[[l]]) + nn$b[[l]])
     }
-    
+
     h_prev <- nn$h[[l + 1]]
   }
   return(nn)
@@ -137,31 +137,31 @@ backward <- function(nn, k) {
   #   - k: output class k (label)
   # Return:
   #   - updated nn with gradient computation for w, b, and h
-  
+
   # number of weight and h
   n_weight <- length(nn$W)
   n_h <- length(nn$h)
   batch_size <- length(k)
-  
+
   # One hot encoding for k matrix (label)
   k_matrix <-
     matrix(0, nrow = nrow(nn$h[[n_h]]), ncol = ncol(nn$h[[n_h]]))
   k_matrix[cbind(1:length(k), k)] <- 1
-  
+
   # Setup a placeholder for the gradients
   dh <- list()
   dW <- list()
   db <- list()
-  
+
   # Get the Likelihood and subtract by 1 for true label
   d_L <- nn$h[[n_weight + 1]]
   d_L <- (d_L - k_matrix)
-  
+
   # Compute the gradient for the output layer
   dh[[n_weight + 1]] <- d_L
   dW[[n_weight]] <- ((t(nn$h[[n_weight]]) %*% d_L) / batch_size)
   db[[n_weight]] <- colMeans(d_L)
-  
+
   # Compute the gradient for the intermediate layers
   for (l in (n_weight):2) {
     # Compute the gradient of the offset, with relu derivative.
@@ -170,11 +170,11 @@ backward <- function(nn, k) {
     dW[[l - 1]] <- ((t(nn$h[[l - 1]]) %*% dh[[l]]) / batch_size)
     db[[l - 1]] <- colMeans(dh[[l]])
   }
-  
+
   nn$dh <- dh
   nn$dW <- dW
   nn$db <- db
-  
+
   return(nn)
 }
 
@@ -189,37 +189,31 @@ train <- function(nn, inp, k, eta = .01, mb = 10, nstep = 10000) {
   #   - nstep: number of step for training. (default: 10000)
   # Return:
   #   - nn: trained model from the input
-  
-  n_miss_event <- 0 # for display
-  
+
   # Training loop for nsteps
   n_data <- nrow(inp)
   for (step in 1:nstep) {
     mb_indices <- sample(n_data, mb)
     X_train_mb <- inp[mb_indices, ]
     y_train_mb <- k[mb_indices]
-    
+
     # Forward and Backward propagration
     nn <- forward(nn, X_train_mb)
     nn <- backward(nn, y_train_mb)
-    
+
     # Update the parameters with computed gradient
     nn$W <- Map(grad_update, nn$W, nn$dW, eta)
     nn$b <- Map(grad_update, nn$b, nn$db, eta)
-    
-    
-    
   }
   return(nn)
 }
 
 # === Demonstrate the Neural Network (NN) Model training on Iris Dataset ===
 
-set.seed(0)
+set.seed(21)
 data(iris)
 vocabs <- c(unique(iris[, 5]))
 iris$k <- match(iris[, 5], vocabs)
-head(iris)
 
 # setup the Neural Network (NN) architecture
 d <- c(4, 8, 7, 3)
@@ -247,59 +241,6 @@ miss_event_pre <- sum(y_test != y_pred_pre)
 # Model Training (fitting)
 nn <-
   train(nn, inp = X_train, k = y_train, eta = .01, mb = 10, nstep = 10000)
-
-# Model Inference & calculate the miss-classification rate
-nn <- forward(nn, X_test)
-y_prob_post <- nn$h[[offset_layer]]
-y_pred_post <- apply(y_prob_post, 1, which.max)
-miss_event_post <- sum(y_test != y_pred_post)
-
-print(paste("[Pre] Misclassification Rate: ", miss_event_pre / n_val_data))
-print(paste("[Post] Misclassification Rate: ", miss_event_post / n_val_data))
-
-
-###New Test Example
-#install.packages("mlbench")
-library(mlbench)
-set.seed(21)
-data(BreastCancer) 
-dim(BreastCancer) 
-levels(BreastCancer$Class) 
-vocabs <- c(unique(BreastCancer[, 11]))
-BreastCancer$k <- match(BreastCancer[, 11], vocabs)
-BreastCancer <- BreastCancer[,2:12]
-head(BreastCancer)
-
-d <- c(9, 32, 16, 2)
-nn <- netup(d)
-offset_layer <- length(nn$h)
-print(nn)
-train_df <- BreastCancer[-seq(5, nrow(BreastCancer), 5), ]
-test_df <- BreastCancer[seq(5, nrow(BreastCancer), 5), ]
-X_train <- matrix(unlist(train_df[, 1:9]), ncol = 9)
-X_train = as.numeric(X_train)
-X_train[is.na(X_train)] = 0
-X_train = matrix(X_train, ncol = 9)
-
-y_train <- train_df$k # TODO: CHANGE THIS
-X_test <- matrix(unlist(test_df[, 1:9]), ncol = 9)
-
-X_test = as.numeric(X_test)
-X_test[is.na(X_test)] = 0
-
-X_test = matrix(X_test, ncol = 9)
-
-y_test <- test_df$k # TODO: CHANGE THIS
-n_val_data <- length(y_test)
-
-nn <- forward(nn, X_test)
-y_prob_pre <- nn$h[[offset_layer]]
-y_pred_pre <- apply(y_prob_pre, 1, which.max)
-miss_event_pre <- sum(y_test != y_pred_pre)
-
-# Model Training (fitting)
-nn <-
-  train(nn, inp = X_train, k = y_train, eta = .01, mb = 10, nstep = 200000)
 
 # Model Inference & calculate the miss-classification rate
 nn <- forward(nn, X_test)
