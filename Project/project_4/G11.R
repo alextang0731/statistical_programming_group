@@ -175,6 +175,7 @@ backward <- function(nn, k) {
   nn$dW <- dW
   nn$db <- db
 
+  class(nn)
   return(nn)
 }
 
